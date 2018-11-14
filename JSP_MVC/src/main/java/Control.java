@@ -6,15 +6,17 @@
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+
 /**
  *
- * @author pedago
+ * @author c
  */
 @WebServlet(name = "Control", urlPatterns = {"/Control"})
 public class Control extends HttpServlet {
@@ -28,20 +30,34 @@ public class Control extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-    
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        try{
-            
-           
-        } catch (Exception e) {
-			// On renseigne un attribut utilisé par la vue
-			request.setAttribute("error", e.getMessage());			
-			// On redirige vers la page d'erreur
-			request.getRequestDispatcher("views/errorView.jsp").forward(request, response);
-		}
+        
+        DAO dao = new DAO();
+        
+        response.setContentType("text/html;charset=UTF-8");
+        String action = request.getParameter("action");
+        
+        if(action.equals("DELETE")){
+            String code = request.getParameter("code");
+            request.setAttribute("mes",dao.delete(code));
+        } else{
+            if(action.equals("ADD")){
+                
+                String key = request.getParameter("code");
+                String val = request.getParameter("taux");
+                System.out.print("On ajoute la valeur" + key);
+                request.setAttribute("mes",dao.add(key, val));
+            }
+            }
+      
+        
+        request.setAttribute("HT", dao.ht);
+        RequestDispatcher rd=request.getRequestDispatcher("index.jsp");  
+        rd.forward(request, response); 
+        
+ 
     }
-    
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
