@@ -6,6 +6,9 @@
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -14,10 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 
-/**
- *
- * @author c
- */
 @WebServlet(name = "Control", urlPatterns = {"/Control"})
 public class Control extends HttpServlet {
 
@@ -31,9 +30,9 @@ public class Control extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+            throws ServletException, IOException, SQLException {
         
-        DAO dao = new DAO();
+        DAO dao = new DAO(DataSourceFactory.getDataSource());
         
         response.setContentType("text/html;charset=UTF-8");
         String action = request.getParameter("action");
@@ -46,13 +45,17 @@ public class Control extends HttpServlet {
                 
                 String key = request.getParameter("code");
                 String val = request.getParameter("taux");
-                System.out.print("On ajoute la valeur" + key);
-                request.setAttribute("mes",dao.add(key, val));
+                if(key != "" && val != ""){
+                    request.setAttribute("mes",dao.add(key, Float.parseFloat(val)));
+                } else {
+                    request.setAttribute("mes", "Un des champs est vide");
+                }
+                
             }
             }
       
-        
-        request.setAttribute("HT", dao.ht);
+        System.out.print(dao.getElements().keySet());
+        request.setAttribute("HT", dao.getElements());
         RequestDispatcher rd=request.getRequestDispatcher("index.jsp");  
         rd.forward(request, response); 
         
@@ -71,7 +74,11 @@ public class Control extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        try {
+            processRequest(request, response);
+        } catch (SQLException ex) {
+            Logger.getLogger(Control.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -85,7 +92,11 @@ public class Control extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        try {
+            processRequest(request, response);
+        } catch (SQLException ex) {
+            Logger.getLogger(Control.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**

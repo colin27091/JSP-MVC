@@ -1,8 +1,4 @@
-<%-- 
-    Document   : JSP
-    Created on : 13 nov. 2018, 16:12:07
-    Author     : pedago
---%>
+
 
 <%@page import="java.util.Iterator"%>
 <%@page import="java.util.Set"%>
